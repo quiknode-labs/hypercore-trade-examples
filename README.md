@@ -1,6 +1,6 @@
 # HyperCore Trade — Examples
 
-Clone-and-run examples for the [HyperCore Trade](https://send.hypercoretrade.xyz) builder API.
+Clone-and-run examples for the [HyperCore Trade](https://hypercoretrade.xyz) builder API.
 Trade perps, spot, and HIP-3 markets on HyperLiquid through a single JSON-RPC endpoint.
 Your private key never leaves your machine — you sign locally, the service forwards to HyperLiquid.
 
