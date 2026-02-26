@@ -1,8 +1,8 @@
 # Hyperliquid API — Examples
 
 Clone-and-run examples for the [Hyperliquid API](https://hyperliquidapi.com) builder API.
-Trade perps, spot, and HIP-3 markets on HyperLiquid through a single JSON-RPC endpoint.
-Your private key never leaves your machine — you sign locally, the service forwards to HyperLiquid.
+Trade perps, spot, and HIP-3 markets on Hyperliquid through a single JSON-RPC endpoint.
+Your private key never leaves your machine — you sign locally, the service forwards to Hyperliquid.
 
 ## Prerequisites
 
@@ -92,7 +92,7 @@ Every example follows the same pattern:
 
 1. **Build** — call `hl_build*` to get a hash (the service computes the EIP-712 hash, injects builder fee)
 2. **Sign** — sign the 32-byte hash locally with your private key
-3. **Send** — call `hl_send*` with the signature (the service forwards to HyperLiquid)
+3. **Send** — call `hl_send*` with the signature (the service forwards to Hyperliquid)
 
 All coin references use names (`"BTC"`, `"ETH"`, `"xyz:SILVER"`) — the service resolves them to numeric indices.
 

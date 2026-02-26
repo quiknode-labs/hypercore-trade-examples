@@ -49,6 +49,6 @@ def sign_hash(hash_hex):
 
 
 def get_mid(coin):
-    """Get the current mid price for a coin from HyperLiquid."""
+    """Get the current mid price for a coin from Hyperliquid."""
     r = requests.post("https://api.hyperliquid.xyz/info", json={"type": "allMids"})
     return float(r.json().get(coin, 0))
