@@ -10,7 +10,7 @@ if mid == 0:
     print(f"Could not fetch {COIN} mid price, using fallback")
     mid = 78.0
 
-sz = round(10.0 / mid, 2)
+sz = round(11.0 / mid, 2)
 buy_px = round(mid * 1.03, 2)
 
 print(f"{COIN} mid: ${mid:,.2f}")
