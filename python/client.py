@@ -1,4 +1,4 @@
-"""Thin RPC client for HyperCore Trade builder API."""
+"""Thin RPC client for Hyperliquid API builder API."""
 
 import json
 import os
@@ -7,7 +7,7 @@ import sys
 import requests
 from eth_account import Account
 
-ENDPOINT = "https://send.hypercoretrade.xyz"
+ENDPOINT = "https://send.hyperliquidapi.com"
 
 _pk = os.environ.get("PRIVATE_KEY")
 if not _pk:

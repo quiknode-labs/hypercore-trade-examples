@@ -1,6 +1,6 @@
 import { Wallet } from "ethers";
 
-const ENDPOINT = "https://send.hypercoretrade.xyz";
+const ENDPOINT = "https://send.hyperliquidapi.com";
 
 const pk = process.env.PRIVATE_KEY;
 if (!pk) {

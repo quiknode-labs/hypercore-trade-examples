@@ -17,7 +17,7 @@ impl Client {
         let pk_bytes = hex::decode(pk.trim_start_matches("0x")).expect("Invalid PRIVATE_KEY hex");
         let signer = PrivateKeySigner::from_slice(&pk_bytes).expect("Invalid private key");
 
-        let endpoint = "https://send.hypercoretrade.xyz".to_string();
+        let endpoint = "https://send.hyperliquidapi.com".to_string();
 
         println!("Wallet: {}", signer.address());
 

@@ -1,4 +1,4 @@
-use hypercore_trade_examples::Client;
+use hyperliquid_api_examples::Client;
 use serde_json::json;
 
 const MAX_FEE: &str = "1%";

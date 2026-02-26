@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "alloy"
-version = "1.7.3"
+version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4973038846323e4e69a433916522195dce2947770076c03078fc21c80ea0f1c4"
+checksum = "2b5033b86af2c64e1b29b8446b7b6c48a0094ccea0b5c408111b6d218c418894"
 dependencies = [
  "alloy-core",
  "alloy-signer",
@@ -1549,7 +1549,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "hypercore-trade-examples"
+name = "hyperliquid-api-examples"
 version = "0.1.0"
 dependencies = [
  "alloy",

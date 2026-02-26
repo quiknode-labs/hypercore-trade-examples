@@ -1,6 +1,6 @@
-# HyperCore Trade — Examples
+# Hyperliquid API — Examples
 
-Clone-and-run examples for the [HyperCore Trade](https://hypercoretrade.xyz) builder API.
+Clone-and-run examples for the [Hyperliquid API](https://hyperliquidapi.com) builder API.
 Trade perps, spot, and HIP-3 markets on HyperLiquid through a single JSON-RPC endpoint.
 Your private key never leaves your machine — you sign locally, the service forwards to HyperLiquid.
 
@@ -98,6 +98,6 @@ All coin references use names (`"BTC"`, `"ETH"`, `"xyz:SILVER"`) — the service
 
 ## API Docs
 
-Full API reference, error codes, and fees: **https://hypercoretrade.xyz**
+Full API reference, error codes, and fees: **https://hyperliquidapi.com**
 
-Wallet-based approval (no code needed): **https://hypercoretrade.xyz/approve**
+Wallet-based approval (no code needed): **https://hyperliquidapi.com/approve**
