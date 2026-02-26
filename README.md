@@ -102,6 +102,8 @@ Full API reference, error codes, and fees: **https://hyperliquidapi.com**
 
 Wallet-based approval (no code needed): **https://hyperliquidapi.com/approve**
 
+llms.txt: **https://hyperliquidapi.com/llms.txt**
+
 ## Disclaimer
 
 Hyperliquid API & hyperliquidapi.com are not affiliated with Hyperliquid Corp or Hyper Foundation.
