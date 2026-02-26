@@ -1,15 +1,17 @@
-import { rpc, signHash } from "./client";
+import { exchange, signHash } from "./client";
 
 const MAX_FEE = "1%";
 
 async function main() {
-  const res = await rpc("hl_buildApproveBuilderFee", { maxFeeRate: MAX_FEE });
-  const sig = await signHash(res.result.hash);
+  const res = await exchange({
+    action: { type: "approveBuilderFee", maxFeeRate: MAX_FEE },
+  });
+  const sig = await signHash(res.hash);
 
-  await rpc("hl_sendApproval", {
-    nonce: res.result.nonce,
+  await exchange({
+    action: { type: "approveBuilderFee", maxFeeRate: MAX_FEE },
+    nonce: res.nonce,
     signature: sig,
-    maxFeeRate: MAX_FEE,
   });
 
   console.log("Builder fee approved.");

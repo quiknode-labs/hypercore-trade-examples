@@ -1,8 +1,8 @@
-import { rpc, wallet } from "./client";
+import { getApproval, address } from "./client";
 
 async function main() {
-  const res = await rpc("hl_getMaxBuilderFee", { user: wallet.address });
-  console.log(JSON.stringify(res.result, null, 2));
+  const res = await getApproval(address);
+  console.log(JSON.stringify(res, null, 2));
 }
 
 main();

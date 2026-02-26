@@ -19,6 +19,7 @@ async fn main() {
     println!("{COIN} mid: ${mid:.2}");
     println!("Placing resting BUY {sz} @ {rest_px} (GTC, 3% below mid)\n");
 
+    // Place resting order
     let res = client
         .exchange(&json!({
             "action": {
@@ -49,22 +50,27 @@ async fn main() {
         .find_map(|s| s["resting"]["oid"].as_u64())
         .expect("Could not extract OID from resting order");
 
+    let new_px = format!("{}", (mid * 0.96) as u64);
     println!("Order resting (OID: {oid})");
-    println!("Cancelling...\n");
+    println!("Modifying price: {rest_px} -> {new_px}\n");
 
-    let cancel_action = json!({
-        "type": "cancel",
-        "cancels": [{"a": COIN, "o": oid}],
+    // Modify order
+    let modify_action = json!({
+        "type": "batchModify",
+        "modifies": [{
+            "oid": oid,
+            "order": {"asset": COIN, "side": "buy", "price": new_px, "size": sz, "tif": "gtc"},
+        }],
     });
 
-    let res = client.exchange(&json!({"action": cancel_action})).await;
+    let res = client.exchange(&json!({"action": modify_action})).await;
 
     let hash = res["hash"].as_str().unwrap();
     let sig = client.sign_hash(hash).await;
 
-    let cancel_result = client
+    let modify_result = client
         .exchange(&json!({
-            "action": cancel_action,
+            "action": modify_action,
             "nonce": res["nonce"],
             "signature": sig,
         }))
@@ -72,7 +78,7 @@ async fn main() {
 
     println!(
         "{}",
-        serde_json::to_string_pretty(&cancel_result["exchangeResponse"]).unwrap()
+        serde_json::to_string_pretty(&modify_result["exchangeResponse"]).unwrap()
     );
-    println!("\nOrder cancelled.");
+    println!("\nOrder modified.");
 }

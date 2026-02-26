@@ -16,14 +16,10 @@ async fn main() {
         std::process::exit(1);
     }
 
-    let res = client
-        .rpc(
-            "hl_orderStatus",
-            json!({"user": format!("{}", client.signer.address()), "oid": oid}),
-        )
+    let result = client
+        .post_endpoint("/orderStatus", &json!({"user": client.address, "oid": oid}))
         .await;
 
-    let result = &res["result"];
     let status = result["status"].as_str().unwrap_or("?");
     let explanation = result["explanation"].as_str().unwrap_or("");
 

@@ -1,14 +1,16 @@
 """Revoke builder fee approval."""
 
-from client import rpc, sign_hash
+from client import exchange, sign_hash
 
-res = rpc("hl_buildRevokeBuilderFee", {})
-sig = sign_hash(res["result"]["hash"])
+res = exchange({
+    "action": {"type": "approveBuilderFee", "maxFeeRate": "0%"},
+})
+sig = sign_hash(res["hash"])
 
-rpc("hl_sendRevocation", {
-    "nonce": res["result"]["nonce"],
+exchange({
+    "action": {"type": "approveBuilderFee", "maxFeeRate": "0%"},
+    "nonce": res["nonce"],
     "signature": sig,
-    "maxFeeRate": "0%",
 })
 
 print("Builder fee revoked.")

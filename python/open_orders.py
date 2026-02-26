@@ -1,10 +1,9 @@
 """View open orders with enriched asset info and pre-built cancel actions."""
 
 import json
-from client import rpc, wallet
+from client import post_endpoint, address
 
-res = rpc("hl_openOrders", {"user": wallet.address})
-result = res["result"]
+result = post_endpoint("/openOrders", {"user": address})
 
 print(f"Open orders: {result['count']}")
 for order in result["orders"]:
@@ -16,7 +15,7 @@ if result["count"] > 0:
     print(f"\nCancel actions by asset:")
     for name, action in result["cancelActions"]["byAsset"].items():
         count = len(action["cancels"])
-        print(f"  {name}: {count} order(s) — pass to hl_buildCancel")
+        print(f"  {name}: {count} order(s) — pass as action to POST /exchange")
 
-    print(f"\nTo cancel ALL orders, pass cancelActions.all to hl_buildCancel:")
+    print(f"\nTo cancel ALL orders, pass cancelActions.all as the action to POST /exchange:")
     print(json.dumps(result["cancelActions"]["all"], indent=2))

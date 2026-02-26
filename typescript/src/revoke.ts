@@ -1,13 +1,15 @@
-import { rpc, signHash } from "./client";
+import { exchange, signHash } from "./client";
 
 async function main() {
-  const res = await rpc("hl_buildRevokeBuilderFee", {});
-  const sig = await signHash(res.result.hash);
+  const res = await exchange({
+    action: { type: "approveBuilderFee", maxFeeRate: "0%" },
+  });
+  const sig = await signHash(res.hash);
 
-  await rpc("hl_sendRevocation", {
-    nonce: res.result.nonce,
+  await exchange({
+    action: { type: "approveBuilderFee", maxFeeRate: "0%" },
+    nonce: res.nonce,
     signature: sig,
-    maxFeeRate: "0%",
   });
 
   console.log("Builder fee revoked.");

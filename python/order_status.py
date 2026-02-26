@@ -2,7 +2,7 @@
 
 import json
 import sys
-from client import rpc, wallet
+from client import post_endpoint, address
 
 oid = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 if oid == 0:
@@ -10,8 +10,7 @@ if oid == 0:
     print("Get OIDs from: python3 open_orders.py")
     sys.exit(1)
 
-res = rpc("hl_orderStatus", {"user": wallet.address, "oid": oid})
-result = res["result"]
+result = post_endpoint("/orderStatus", {"user": address, "oid": oid})
 
 if result["status"] == "unknownOid":
     print(f"Order {oid}: not found")

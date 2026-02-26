@@ -1,32 +1,34 @@
 use hyperliquid_api_examples::Client;
 use serde_json::json;
 
-const COIN: &str = "BTC";
+const COIN: &str = "HYPE";
 
 #[tokio::main]
 async fn main() {
     let client = Client::from_env();
 
-    let mid = client.get_mid(COIN).await;
-    if mid == 0.0 {
-        eprintln!("Could not fetch {COIN} mid price");
-        std::process::exit(1);
-    }
-
-    let sz = format!("{:.5}", 11.0 / mid);
-    let buy_px = format!("{}", (mid * 1.03) as u64);
-
-    println!("{COIN} mid: ${mid:.2}");
-    println!("BUY {sz} @ {buy_px} (IOC)");
+    println!("Closing {COIN} position for {}\n", client.address);
 
     let res = client
         .exchange(&json!({
             "action": {
-                "type": "order",
-                "orders": [{"asset": COIN, "side": "buy", "price": buy_px, "size": sz, "tif": "ioc"}],
+                "type": "closePosition",
+                "asset": COIN,
+                "user": client.address,
             },
         }))
         .await;
+
+    if let Some(ctx) = res.get("closePositionContext") {
+        println!(
+            "Position: {} {}",
+            ctx["positionSize"], ctx["positionSide"]
+        );
+        println!(
+            "Close: {} {} @ {}",
+            ctx["closeSide"], ctx["closeSize"], ctx["slippedPrice"]
+        );
+    }
 
     let hash = res["hash"].as_str().unwrap();
     let sig = client.sign_hash(hash).await;
@@ -43,4 +45,5 @@ async fn main() {
         "{}",
         serde_json::to_string_pretty(&result["exchangeResponse"]).unwrap()
     );
+    println!("\nPosition closed.");
 }

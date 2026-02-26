@@ -1,20 +1,19 @@
-import { rpc, signHash, getMid } from "./client";
+import { exchange, signHash, getMid } from "./client";
 
 const COIN = "BTC";
 
-async function sendOrder(isBuy: boolean, px: string, sz: string) {
-  const action = {
-    type: "order",
-    orders: [{ a: COIN, b: isBuy, p: px, s: sz, r: false, t: { limit: { tif: "Ioc" } } }],
-    grouping: "na",
-  };
+async function sendOrder(side: string, px: string, sz: string) {
+  const res = await exchange({
+    action: {
+      type: "order",
+      orders: [{ asset: COIN, side, price: px, size: sz, tif: "ioc" }],
+    },
+  });
+  const sig = await signHash(res.hash);
 
-  const res = await rpc("hl_buildOrder", { action });
-  const sig = await signHash(res.result.hash);
-
-  return rpc("hl_sendOrder", {
-    action: res.result.action || action,
-    nonce: res.result.nonce,
+  return exchange({
+    action: res.action,
+    nonce: res.nonce,
     signature: sig,
   });
 }
@@ -43,8 +42,8 @@ async function main() {
 
   const buyPx = Math.floor(mid * 1.03).toString();
   console.log(`BUY ${sz} @ ${buyPx} (IOC)`);
-  const buyResult = await sendOrder(true, buyPx, sz);
-  const buyResp = buyResult.result.exchangeResponse;
+  const buyResult = await sendOrder("buy", buyPx, sz);
+  const buyResp = buyResult.exchangeResponse;
   if (!checkStatuses(buyResp, "BUY")) {
     process.exit(1);
   }
@@ -54,8 +53,8 @@ async function main() {
 
   const sellPx = Math.floor(mid * 0.97).toString();
   console.log(`SELL ${sz} @ ${sellPx} (IOC)`);
-  const sellResult = await sendOrder(false, sellPx, sz);
-  const sellResp = sellResult.result.exchangeResponse;
+  const sellResult = await sendOrder("sell", sellPx, sz);
+  const sellResp = sellResult.exchangeResponse;
   if (!checkStatuses(sellResp, "SELL")) {
     process.exit(1);
   }

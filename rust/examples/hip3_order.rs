@@ -1,23 +1,23 @@
 use hyperliquid_api_examples::Client;
 use serde_json::json;
 
-const COIN: &str = "BTC";
+const COIN: &str = "xyz:SILVER";
 
 #[tokio::main]
 async fn main() {
     let client = Client::from_env();
 
-    let mid = client.get_mid(COIN).await;
+    let mut mid = client.get_hip3_mid(COIN).await;
     if mid == 0.0 {
-        eprintln!("Could not fetch {COIN} mid price");
-        std::process::exit(1);
+        println!("Could not fetch {COIN} mid price, using fallback");
+        mid = 78.0;
     }
 
-    let sz = format!("{:.5}", 11.0 / mid);
-    let buy_px = format!("{}", (mid * 1.03) as u64);
+    let sz = format!("{:.2}", 11.0 / mid);
+    let buy_px = format!("{:.2}", mid * 1.03);
 
     println!("{COIN} mid: ${mid:.2}");
-    println!("BUY {sz} @ {buy_px} (IOC)");
+    println!("BUY {sz} @ {buy_px} (IOC, ~${:.2} notional)\n", sz.parse::<f64>().unwrap() * mid);
 
     let res = client
         .exchange(&json!({

@@ -1,4 +1,4 @@
-import { rpc } from "./client";
+import { getMarkets } from "./client";
 
 interface Market {
   name: string;
@@ -7,8 +7,7 @@ interface Market {
 }
 
 async function main() {
-  const res = await rpc("hl_listMarkets");
-  const data: { perps: Market[]; spot: Market[]; hip3: Record<string, Market[]> } = res.result;
+  const data: { perps: Market[]; spot: Market[]; hip3: Record<string, Market[]> } = await getMarkets();
 
   const { perps, spot, hip3 } = data;
 

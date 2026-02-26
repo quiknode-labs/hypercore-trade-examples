@@ -1,7 +1,7 @@
 """Place a perp limit order (BTC, IOC, ~$10 notional)."""
 
 import json
-from client import rpc, sign_hash, get_mid
+from client import exchange, sign_hash, get_mid
 
 COIN = "BTC"
 
@@ -16,26 +16,24 @@ buy_px = int(mid * 1.03)
 print(f"{COIN} mid: ${mid:,.2f}")
 print(f"BUY {sz} @ {buy_px} (IOC, ~${sz * mid:.2f} notional)")
 
-action = {
-    "type": "order",
-    "orders": [{
-        "a": COIN,
-        "b": True,
-        "p": str(buy_px),
-        "s": str(sz),
-        "r": False,
-        "t": {"limit": {"tif": "Ioc"}},
-    }],
-    "grouping": "na",
-}
+res = exchange({
+    "action": {
+        "type": "order",
+        "orders": [{
+            "asset": COIN,
+            "side": "buy",
+            "price": str(buy_px),
+            "size": str(sz),
+            "tif": "ioc",
+        }],
+    },
+})
+sig = sign_hash(res["hash"])
 
-res = rpc("hl_buildOrder", {"action": action})
-sig = sign_hash(res["result"]["hash"])
-
-result = rpc("hl_sendOrder", {
-    "action": res["result"].get("action", action),
-    "nonce": res["result"]["nonce"],
+result = exchange({
+    "action": res["action"],
+    "nonce": res["nonce"],
     "signature": sig,
 })
 
-print(json.dumps(result["result"]["exchangeResponse"], indent=2))
+print(json.dumps(result["exchangeResponse"], indent=2))

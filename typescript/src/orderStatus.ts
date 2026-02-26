@@ -1,4 +1,4 @@
-import { rpc, wallet } from "./client";
+import { postEndpoint, address } from "./client";
 
 async function main() {
   const oid = parseInt(process.argv[2] || "0", 10);
@@ -8,8 +8,7 @@ async function main() {
     process.exit(1);
   }
 
-  const res = await rpc("hl_orderStatus", { user: wallet.address, oid });
-  const result = res.result;
+  const result = await postEndpoint("/orderStatus", { user: address, oid });
 
   if (result.status === "unknownOid") {
     console.log(`Order ${oid}: not found`);

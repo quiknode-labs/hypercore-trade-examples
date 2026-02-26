@@ -1,9 +1,8 @@
 """List all available markets (perps, spot, HIP-3)."""
 
-from client import rpc
+from client import get_markets
 
-res = rpc("hl_listMarkets")
-data = res["result"]
+data = get_markets()
 
 perps = data.get("perps", [])
 spot = data.get("spot", [])

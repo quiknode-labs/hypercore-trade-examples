@@ -2,7 +2,7 @@
 
 import json
 import time
-from client import rpc, sign_hash, get_mid
+from client import exchange, sign_hash, get_mid
 
 COIN = "BTC"
 
@@ -16,32 +16,31 @@ print(f"{COIN} mid: ${mid:,.2f}")
 print(f"Trade size: {sz} {COIN} (~${sz * mid:.2f})\n")
 
 
-def send_order(is_buy, px):
-    action = {
-        "type": "order",
-        "orders": [{
-            "a": COIN,
-            "b": is_buy,
-            "p": str(px),
-            "s": str(sz),
-            "r": False,
-            "t": {"limit": {"tif": "Ioc"}},
-        }],
-        "grouping": "na",
-    }
-    res = rpc("hl_buildOrder", {"action": action})
-    sig = sign_hash(res["result"]["hash"])
-    return rpc("hl_sendOrder", {
-        "action": res["result"].get("action", action),
-        "nonce": res["result"]["nonce"],
+def send_order(side, px):
+    res = exchange({
+        "action": {
+            "type": "order",
+            "orders": [{
+                "asset": COIN,
+                "side": side,
+                "price": str(px),
+                "size": str(sz),
+                "tif": "ioc",
+            }],
+        },
+    })
+    sig = sign_hash(res["hash"])
+    return exchange({
+        "action": res["action"],
+        "nonce": res["nonce"],
         "signature": sig,
     })
 
 
 buy_px = int(mid * 1.03)
 print(f"BUY {sz} @ {buy_px} (IOC)")
-buy_result = send_order(True, buy_px)
-buy_resp = buy_result["result"]["exchangeResponse"]
+buy_result = send_order("buy", buy_px)
+buy_resp = buy_result["exchangeResponse"]
 statuses = buy_resp.get("response", {}).get("data", {}).get("statuses", [])
 for s in statuses:
     if isinstance(s, dict) and "error" in s:
@@ -53,8 +52,8 @@ time.sleep(1)
 
 sell_px = int(mid * 0.97)
 print(f"SELL {sz} @ {sell_px} (IOC)")
-sell_result = send_order(False, sell_px)
-sell_resp = sell_result["result"]["exchangeResponse"]
+sell_result = send_order("sell", sell_px)
+sell_resp = sell_result["exchangeResponse"]
 statuses = sell_resp.get("response", {}).get("data", {}).get("statuses", [])
 for s in statuses:
     if isinstance(s, dict) and "error" in s:

@@ -1,4 +1,4 @@
-import { rpc, signHash, getMid } from "./client";
+import { exchange, signHash, getMid } from "./client";
 
 const COIN = "BTC";
 
@@ -15,23 +15,22 @@ async function main() {
   console.log(`${COIN} mid: $${mid.toLocaleString()}`);
   console.log(`Placing resting BUY ${sz} @ ${restPx} (GTC, 3% below mid)\n`);
 
-  const orderAction = {
-    type: "order",
-    orders: [{ a: COIN, b: true, p: restPx, s: sz, r: false, t: { limit: { tif: "Gtc" } } }],
-    grouping: "na",
-  };
+  let res = await exchange({
+    action: {
+      type: "order",
+      orders: [{ asset: COIN, side: "buy", price: restPx, size: sz, tif: "gtc" }],
+    },
+  });
+  let sig = await signHash(res.hash);
 
-  let res = await rpc("hl_buildOrder", { action: orderAction });
-  let sig = await signHash(res.result.hash);
-
-  const result = await rpc("hl_sendOrder", {
-    action: res.result.action || orderAction,
-    nonce: res.result.nonce,
+  const result = await exchange({
+    action: res.action,
+    nonce: res.nonce,
     signature: sig,
   });
 
-  const exchange = result.result.exchangeResponse;
-  const statuses = exchange?.response?.data?.statuses || [];
+  const exchangeResp = result.exchangeResponse;
+  const statuses = exchangeResp?.response?.data?.statuses || [];
 
   let oid: number | null = null;
   for (const s of statuses) {
@@ -43,7 +42,7 @@ async function main() {
 
   if (oid === null) {
     console.error("Could not extract OID from resting order");
-    console.log(JSON.stringify(exchange, null, 2));
+    console.log(JSON.stringify(exchangeResp, null, 2));
     process.exit(1);
   }
 
@@ -55,16 +54,16 @@ async function main() {
     cancels: [{ a: COIN, o: oid }],
   };
 
-  res = await rpc("hl_buildCancel", { action: cancelAction });
-  sig = await signHash(res.result.hash);
+  res = await exchange({ action: cancelAction });
+  sig = await signHash(res.hash);
 
-  const cancelResult = await rpc("hl_sendCancel", {
+  const cancelResult = await exchange({
     action: cancelAction,
-    nonce: res.result.nonce,
+    nonce: res.nonce,
     signature: sig,
   });
 
-  console.log(JSON.stringify(cancelResult.result.exchangeResponse, null, 2));
+  console.log(JSON.stringify(cancelResult.exchangeResponse, null, 2));
   console.log("\nOrder cancelled.");
 }
 

@@ -1,4 +1,4 @@
-import { rpc, signHash, getMid } from "./client";
+import { exchange, signHash, getMid } from "./client";
 
 const COIN = "BTC";
 
@@ -15,22 +15,21 @@ async function main() {
   console.log(`${COIN} mid: $${mid.toLocaleString()}`);
   console.log(`BUY ${sz} @ ${buyPx} (IOC, ~$${(parseFloat(sz) * mid).toFixed(2)} notional)`);
 
-  const action = {
-    type: "order",
-    orders: [{ a: COIN, b: true, p: buyPx, s: sz, r: false, t: { limit: { tif: "Ioc" } } }],
-    grouping: "na",
-  };
+  const res = await exchange({
+    action: {
+      type: "order",
+      orders: [{ asset: COIN, side: "buy", price: buyPx, size: sz, tif: "ioc" }],
+    },
+  });
+  const sig = await signHash(res.hash);
 
-  const res = await rpc("hl_buildOrder", { action });
-  const sig = await signHash(res.result.hash);
-
-  const result = await rpc("hl_sendOrder", {
-    action: res.result.action || action,
-    nonce: res.result.nonce,
+  const result = await exchange({
+    action: res.action,
+    nonce: res.nonce,
     signature: sig,
   });
 
-  console.log(JSON.stringify(result.result.exchangeResponse, null, 2));
+  console.log(JSON.stringify(result.exchangeResponse, null, 2));
 }
 
 main();

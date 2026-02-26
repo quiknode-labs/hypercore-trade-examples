@@ -1,5 +1,5 @@
 use hyperliquid_api_examples::Client;
-use serde_json::{json, Value};
+use serde_json::Value;
 
 fn print_group(label: &str, markets: &[Value]) {
     if markets.is_empty() {
@@ -21,19 +21,19 @@ fn print_group(label: &str, markets: &[Value]) {
 #[tokio::main]
 async fn main() {
     let client = Client::from_env();
-    let res = client.rpc("hl_listMarkets", json!({})).await;
+    let res = client.get_markets().await;
 
-    let perps = res["result"]["perps"]
+    let perps = res["perps"]
         .as_array()
         .map(|a| a.as_slice())
         .unwrap_or(&[]);
-    let spot = res["result"]["spot"]
+    let spot = res["spot"]
         .as_array()
         .map(|a| a.as_slice())
         .unwrap_or(&[]);
 
     let mut hip3_all: Vec<Value> = Vec::new();
-    if let Some(hip3_map) = res["result"]["hip3"].as_object() {
+    if let Some(hip3_map) = res["hip3"].as_object() {
         for (dex, markets) in hip3_map {
             if let Some(arr) = markets.as_array() {
                 for m in arr {

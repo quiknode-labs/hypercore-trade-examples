@@ -1,7 +1,7 @@
 """Check builder fee approval status."""
 
 import json
-from client import rpc, wallet
+from client import get_approval, address
 
-res = rpc("hl_getMaxBuilderFee", {"user": wallet.address})
-print(json.dumps(res["result"], indent=2))
+res = get_approval(address)
+print(json.dumps(res, indent=2))

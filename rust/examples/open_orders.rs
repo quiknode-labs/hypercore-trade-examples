@@ -5,14 +5,10 @@ use serde_json::json;
 async fn main() {
     let client = Client::from_env();
 
-    let res = client
-        .rpc(
-            "hl_openOrders",
-            json!({"user": format!("{}", client.signer.address())}),
-        )
+    let result = client
+        .post_endpoint("/openOrders", &json!({"user": client.address}))
         .await;
 
-    let result = &res["result"];
     let count = result["count"].as_u64().unwrap_or(0);
     println!("Open orders: {count}");
 
@@ -29,7 +25,7 @@ async fn main() {
     }
 
     if count > 0 {
-        println!("\nTo cancel ALL orders, pass cancelActions.all to hl_buildCancel:");
+        println!("\nTo cancel ALL orders, pass cancelActions.all as action to POST /exchange:");
         println!(
             "{}",
             serde_json::to_string_pretty(&result["cancelActions"]["all"]).unwrap()

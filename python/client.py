@@ -1,4 +1,7 @@
-"""Thin RPC client for Hyperliquid API builder API."""
+"""REST client for Hyperliquid API (via QuickNode builder API).
+
+No SDK required -- just requests + eth_account.
+"""
 
 import json
 import os
@@ -7,7 +10,8 @@ import sys
 import requests
 from eth_account import Account
 
-ENDPOINT = "https://send.hyperliquidapi.com"
+API_URL = "https://send.hyperliquidapi.com"
+HL_INFO_URL = "https://api.hyperliquid.xyz/info"
 
 _pk = os.environ.get("PRIVATE_KEY")
 if not _pk:
@@ -15,31 +19,41 @@ if not _pk:
     sys.exit(1)
 
 wallet = Account.from_key(_pk)
-print(f"Wallet: {wallet.address}")
+address = wallet.address
+print(f"Wallet: {address}")
 
-_req_id = 0
 
-
-def rpc(method, params=None):
-    global _req_id
-    _req_id += 1
-    r = requests.post(ENDPOINT, json={
-        "jsonrpc": "2.0",
-        "method": method,
-        "params": params or {},
-        "id": _req_id,
-    })
+def exchange(body):
+    """POST /exchange -- build (no signature) or send (with signature)."""
+    r = requests.post(f"{API_URL}/exchange", json=body)
     data = r.json()
     if data.get("error"):
-        err = data["error"]
-        print(f"\nRPC error ({method}):")
-        print(f"  code:     {err.get('code')}")
-        print(f"  message:  {err.get('message')}")
-        guidance = err.get("data", {}).get("guidance")
+        print(f"\nError ({r.status_code}):")
+        print(f"  error:    {data.get('error')}")
+        print(f"  message:  {data.get('message')}")
+        guidance = data.get("guidance")
         if guidance:
             print(f"  guidance: {guidance}")
         sys.exit(1)
     return data
+
+
+def get_approval(user):
+    """GET /approval?user=<addr> -- check builder fee approval status."""
+    r = requests.get(f"{API_URL}/approval", params={"user": user})
+    return r.json()
+
+
+def get_markets():
+    """GET /markets -- list all available markets."""
+    r = requests.get(f"{API_URL}/markets")
+    return r.json()
+
+
+def post_endpoint(path, body):
+    """POST to a utility endpoint (e.g. /openOrders, /orderStatus, /preflight)."""
+    r = requests.post(f"{API_URL}{path}", json=body)
+    return r.json()
 
 
 def sign_hash(hash_hex):
@@ -50,5 +64,12 @@ def sign_hash(hash_hex):
 
 def get_mid(coin):
     """Get the current mid price for a coin from Hyperliquid."""
-    r = requests.post("https://api.hyperliquid.xyz/info", json={"type": "allMids"})
+    r = requests.post(HL_INFO_URL, json={"type": "allMids"})
+    return float(r.json().get(coin, 0))
+
+
+def get_hip3_mid(coin):
+    """Get mid price for a HIP-3 market (requires dex parameter)."""
+    dex = coin.split(":")[0]
+    r = requests.post(HL_INFO_URL, json={"type": "allMids", "dex": dex})
     return float(r.json().get(coin, 0))
