@@ -1,7 +1,7 @@
 # Hyperliquid API — Examples
 
 Clone-and-run examples for the [Hyperliquid API](https://hyperliquidapi.com) builder API.
-Trade perps, spot, and HIP-3 markets on Hyperliquid through a single JSON-RPC endpoint.
+Trade perps, spot, and HIP-3 markets on Hyperliquid via a single REST API endpoint.
 Your private key never leaves your machine — you sign locally, the service forwards to Hyperliquid.
 
 ## Prerequisites
